@@ -142,7 +142,7 @@ export default function ModalProduct() {
 
   return (
     <Grid container justify="center" alignItems="center">
-      Trabalho dos braboes
+      Trabalho APA 2021.1
       <Grid container justify="center">
         <Grid
           container
@@ -181,7 +181,7 @@ export default function ModalProduct() {
                 alignItems="center"
                 style={{ marginRight: 20 }}
               >
-                <Typography>Adicioanr nós</Typography> <AiOutlinePlus />
+                <Typography>Adicionar novo nó</Typography> <AiOutlinePlus />
               </Grid>
             </Grid>
             <Grid>
