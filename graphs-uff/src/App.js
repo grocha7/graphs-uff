@@ -38,7 +38,14 @@ export default function ModalProduct() {
   };
 
   const handleChangeColors = (value, index) => {
-    setColors(colors.map((item, i) => (i !== index ? item : value)));
+    const newColors = colors.map(colors => colors);
+    newColors.push(value);
+    const arr = []
+     newColors.forEach((item, i) => {
+      return i !== index ? arr.push(item) : arr.push(value)
+    });
+    setColors(arr);
+
   };
 
   const handleAddNodes = () => {
