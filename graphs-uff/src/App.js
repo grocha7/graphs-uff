@@ -134,6 +134,7 @@ export default function ModalProduct() {
   };
 
   const onClickLink = function(source, target) {
+    setNodeSelected(null);
     const newLink = links.filter(item => item.source !== source);
     setLinks(newLink);
 
