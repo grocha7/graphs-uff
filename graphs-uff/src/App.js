@@ -161,7 +161,7 @@ export default function ModalProduct() {
               <Input
                 field="Cor"
                 select
-                options={['blue', 'yellow', 'green']}
+                options={['blue', 'yellow', 'green', 'purple', 'black', 'grey', 'pink']}
                 onChange={event =>
                   handleChangeColors(event.target.value, index)
                 }
