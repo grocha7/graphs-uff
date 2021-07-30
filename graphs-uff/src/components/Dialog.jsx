@@ -13,8 +13,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AlertDialogSlide({open, handleClose, linkColor, handleChangeDeleteLink, handleChangeColorLink}) {
+export default function AlertDialogSlide({open, handleClose, linkColor, handleChangeDeleteLink, handleChangeColorLink, linkLabel}) {
 const [color, setColor] = React.useState(linkColor)
+const [label, setlabel] = React.useState(linkLabel)
+
 
   return (
     <div>
@@ -30,7 +32,7 @@ const [color, setColor] = React.useState(linkColor)
         <DialogTitle id="alert-dialog-slide-title">O que você deseja fazer</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            <Grid container>
+            <Grid container alignItems='center'>
             <Input
                 field="Cor"
                 select
@@ -42,8 +44,17 @@ const [color, setColor] = React.useState(linkColor)
                 width={100}
                 marginRight={20}
               />
+              <Input
+                field="Peso"
+                onChange={event =>
+                  setlabel(event.target.value)
+                }
+                value={label}
+                width={50}
+                marginRight={20}
+              />
               <Button onClick={() => {
-                handleChangeColorLink(color);
+                handleChangeColorLink(color, label);
                 handleClose();
               }} color="secondary">
            Salvar

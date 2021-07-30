@@ -17,6 +17,7 @@ export default function ModalProduct() {
   const [target, setTarget] = useState(null);
   const [source, setSource] = useState(null);
   const [colorLink, setColorLink] = useState(null);
+  const [linkLabel, setLinkLabel] = useState(null);
 
   const data = {
     nodes,
@@ -29,11 +30,16 @@ export default function ModalProduct() {
       color: 'lightgreen',
       size: 2000,
       highlightStrokeColor: 'blue',
+      fontSize: 12,
+      fontWeight: 'bold'
     },
     link: {
       highlightColor: 'lightblue',
       renderLabel: true,
       labelProperty: 'label',
+      label: '5',
+      fontSize: 12,
+      fontWeight: 'bold'
     },
   };
 
@@ -141,6 +147,7 @@ export default function ModalProduct() {
   const onClickLink = function(event, source, target) {
     const linkSelected = links.filter(item => item.source !== source && item.target !== target);
     setColorLink(linkSelected.color);
+    setLinkLabel(linkSelected.label)
     setTarget(target);
     setSource(source);
     setNodeSelected(null);
@@ -148,9 +155,10 @@ export default function ModalProduct() {
  
   };
 
-  const handleChangeColorLink = function(color) {
+  const handleChangeColorLink = function(color, label) {
     const linkSelected = links.filter(item => item.source !== source && item.target !== target);
     linkSelected[0].color = color;
+    linkSelected[0].label = label;
     console.log(linkSelected);
     const newLink = links.map(item => item.source !== source && item.target !== target ? item : linkSelected[0]);
     setLinks(newLink);
@@ -163,7 +171,7 @@ export default function ModalProduct() {
 
   return (
     <Grid container justify="center" alignItems="center">
-      <Dialog open={open} handleChangeColorLink={handleChangeColorLink} handleChangeDeleteLink={handleChangeDeleteLink} linkColor={colorLink} handleClose={() => setOpen(false)}/>
+      <Dialog open={open} handleChangeColorLink={handleChangeColorLink} handleChangeDeleteLink={handleChangeDeleteLink} linkLabel={linkLabel} linkColor={colorLink} handleClose={() => setOpen(false)}/>
       Trabalho APA 2021.1
       <Grid container justify="center">
         <Grid
