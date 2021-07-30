@@ -229,7 +229,7 @@ export default function ModalProduct() {
             <Typography>Matriz de incidência</Typography>
           </Grid>
         </Grid> */}
-        <Grid container justify="center">
+        <Grid container justify="center" style={{border: '1px solid #000000', width: 800, marginBottom: 10}}>
           <Graph
             id="graph-id" // id is mandatory
             data={data}
@@ -238,6 +238,9 @@ export default function ModalProduct() {
             onClickLink={onClickLink}
           />
         </Grid>
+      </Grid>
+      <Grid container alignItems='flex-end' justify='center'>
+        <Typography>Trabalho realizado por Eriky Nunes e Gian Rocha</Typography>
       </Grid>
     </Grid>
   );
