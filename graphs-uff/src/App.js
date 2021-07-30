@@ -174,8 +174,13 @@ export default function ModalProduct() {
   }
   
   const handleChangeDeleteLink = () => {
-     const newLink = links.filter(item => ((item.source !== source && item.target !== target)));
-     setLinks(newLink);
+    const arr = []
+     const newLink = links.map(item => {
+       if(item.source !== source || item.target !== target){
+        arr.push(item);
+       }
+     });
+     setLinks(arr);
   }
 
   return (
