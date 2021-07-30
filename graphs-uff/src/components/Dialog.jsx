@@ -29,7 +29,7 @@ const [label, setlabel] = React.useState(linkLabel)
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle id="alert-dialog-slide-title">O que você deseja fazer</DialogTitle>
+        <DialogTitle id="alert-dialog-slide-title">O que você deseja fazer?</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
             <Grid container alignItems='center'>
@@ -67,7 +67,7 @@ const [label, setlabel] = React.useState(linkLabel)
           handleChangeDeleteLink();
           handleClose();
         }} color="secondary">
-            EXCLUIR NÓ
+            EXCLUIR LINK
           </Button>
           <Button onClick={handleClose} color="primary">
             Fechar

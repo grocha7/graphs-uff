@@ -6,6 +6,7 @@ import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai';
 import Input from './components/TextInput';
 import Dialog from './components/Dialog';
 
+
 export default function ModalProduct() {
   const [nodes, setNodes] = useState([]);
   const [nodeNames, setNodeNames] = useState(['']);
@@ -63,6 +64,7 @@ export default function ModalProduct() {
     const arr = nodeNames.map(item => item);
     arr.push('');
     const arrC = colors.map(item => item);
+    arrC.push('');
     setNodeNames(arr);
     setColors(arrC);
   };
@@ -79,6 +81,10 @@ export default function ModalProduct() {
   const handleDelete = index => {
     const newNodeNames = nodeNames.filter((item, i) => index !== i);
     const newcolors = colors.filter((item, i) => index !== i);
+    const nodeDeleted = nodeNames.filter((item, i) => index === i);
+    console.log(nodeDeleted);
+    console.log(links);
+    setLinks(links.filter(item => item.source !== nodeDeleted[0] && item.target !== nodeDeleted[0]))
     setNodeNames(newNodeNames);
     setColors(newcolors);
     setNodes(
@@ -144,19 +150,22 @@ export default function ModalProduct() {
     );
   };
 
-  const onClickLink = function(event, source, target) {
-    const linkSelected = links.filter(item => item.source !== source && item.target !== target);
-    setColorLink(linkSelected.color);
-    setLinkLabel(linkSelected.label)
+  const onClickLink = function( source, target) {
+    setNodeSelected(null);
+    const linkSelected = links.filter(item => item.source === source && item.target === target);
+    console.log(linkSelected);
+    setColorLink(linkSelected[0].color);
+    setLinkLabel(linkSelected[0].label)
     setTarget(target);
     setSource(source);
-    setNodeSelected(null);
+    console.log(target);
+    console.log(source);
     setOpen(true);
  
   };
 
   const handleChangeColorLink = function(color, label) {
-    const linkSelected = links.filter(item => item.source !== source && item.target !== target);
+    const linkSelected = links.filter(item => item.source === source && item.target === target);
     linkSelected[0].color = color;
     linkSelected[0].label = label;
     console.log(linkSelected);
@@ -165,13 +174,18 @@ export default function ModalProduct() {
   }
   
   const handleChangeDeleteLink = () => {
-     const newLink = links.filter(item => item.source === source && item.target === target);
+     const newLink = links.filter(item => ((item.source !== source && item.target !== target)));
      setLinks(newLink);
   }
 
   return (
-    <Grid container justify="center" alignItems="center">
-      <Dialog open={open} handleChangeColorLink={handleChangeColorLink} handleChangeDeleteLink={handleChangeDeleteLink} linkLabel={linkLabel} linkColor={colorLink} handleClose={() => setOpen(false)}/>
+
+            <Grid container justify="center" alignItems="center">
+      <Dialog open={open} handleChangeColorLink={handleChangeColorLink} handleChangeDeleteLink={handleChangeDeleteLink} linkLabel={linkLabel} linkColor={colorLink} handleClose={() => {
+        setOpen(false);
+        setTarget(null)
+        setSource(null)
+      }}/>
       Trabalho APA 2021.1
       <Grid container justify="center">
         <Grid
@@ -242,6 +256,6 @@ export default function ModalProduct() {
       <Grid container alignItems='flex-end' justify='center'>
         <Typography>Trabalho realizado por Eriky Nunes e Gian Rocha</Typography>
       </Grid>
-    </Grid>
+    </Grid>    
   );
 }
