@@ -3,7 +3,8 @@ import { Grid, IconButton, Typography } from '@material-ui/core';
 import { Graph } from 'react-d3-graph';
 import { MdSave } from 'react-icons/md';
 import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai';
-import Input from './TextInput';
+import Input from './components/TextInput';
+import Dialog from './components/Dialog';
 
 export default function ModalProduct() {
   const [nodes, setNodes] = useState([]);
@@ -12,6 +13,10 @@ export default function ModalProduct() {
   const [links, setLinks] = useState([]);
   const [nodeSelected, setNodeSelected] = useState(null);
   const [originalColor, setOriginalColor] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [target, setTarget] = useState(null);
+  const [source, setSource] = useState(null);
+  const [colorLink, setColorLink] = useState(null);
 
   const data = {
     nodes,
@@ -133,16 +138,32 @@ export default function ModalProduct() {
     );
   };
 
-  const onClickLink = function(source, target) {
+  const onClickLink = function(event, source, target) {
+    const linkSelected = links.filter(item => item.source !== source && item.target !== target);
+    setColorLink(linkSelected.color);
+    setTarget(target);
+    setSource(source);
     setNodeSelected(null);
-    const newLink = links.filter(item => item.source !== source);
-    setLinks(newLink);
-
-    window.alert(`Link de ${source} com ${target} desfeito`);
+    setOpen(true);
+ 
   };
+
+  const handleChangeColorLink = function(color) {
+    const linkSelected = links.filter(item => item.source !== source && item.target !== target);
+    linkSelected[0].color = color;
+    console.log(linkSelected);
+    const newLink = links.map(item => item.source !== source && item.target !== target ? item : linkSelected[0]);
+    setLinks(newLink);
+  }
+  
+  const handleChangeDeleteLink = () => {
+     const newLink = links.filter(item => item.source === source && item.target === target);
+     setLinks(newLink);
+  }
 
   return (
     <Grid container justify="center" alignItems="center">
+      <Dialog open={open} handleChangeColorLink={handleChangeColorLink} handleChangeDeleteLink={handleChangeDeleteLink} linkColor={colorLink} handleClose={() => setOpen(false)}/>
       Trabalho APA 2021.1
       <Grid container justify="center">
         <Grid
@@ -192,6 +213,14 @@ export default function ModalProduct() {
             </Grid>
           </Grid>
         </Grid>
+        {/* <Grid container justify='center'>
+          <Grid>
+
+          </Grid>
+          <Grid>
+            <Typography>Matriz de incidência</Typography>
+          </Grid>
+        </Grid> */}
         <Grid container justify="center">
           <Graph
             id="graph-id" // id is mandatory
