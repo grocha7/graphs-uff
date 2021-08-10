@@ -117,13 +117,13 @@ export default function ModalProduct() {
     //Logica para preencher as incidencias -> se o elemento inc[i][0] for um elemento do link[0][i] colocar 1, caso contrario 0;
     let nodesLength = nodes?.length;
     let linksLength = links?.length;
-    // for (let i = 1; i < incLength+1; i++) {
-    //   for (let j = 1; j <incLength+1; j++) {            
-    //     links.forEach(item => {
-    //       if((item.source === inc[i][0] && item.target === inc[0][j]) || (item.target === inc[i][0] && item.source === inc[0][j])) return inc[i][j] = '1';              
-    //     })            
-    //   }
-    // }
+    for (let i = 1; i < nodesLength+1; i++) {
+      for (let j = 1; j <linksLength+1; j++) {            
+        links.forEach(item => {
+          if(item.source == inc[i][0] || item.target == inc[i][0]) return inc[i][j] = '1';              
+        })            
+      }
+    }
     //Logica para preencher os elementos vazios ou que não tenha adjacencia
     inc[0][0] = ' ';
     // for (let i = 1; i < linksLength+1; i++) {
