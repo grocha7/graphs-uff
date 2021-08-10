@@ -20,7 +20,7 @@ export default function ModalProduct() {
   const [colorLink, setColorLink] = useState(null);
   const [linkLabel, setLinkLabel] = useState(null);
   const [adj, setAdj] = useState([]);
-  const [inc, setInc] = useState([]);
+  const [incid, setIncid] = useState([]);
 
   const data = {
     nodes,
@@ -98,46 +98,52 @@ export default function ModalProduct() {
         }
       }
     }    
-    console.log('links', links);
-    console.log('adj', adj);
+    setAdj(adj);
   }
 
   const handleInc = () => {
-    let inc = new Array(nodes?.length + 1);
+    //Inicializando a matriz
+    let inc = new Array(links?.length+1);
     for(let i=0; i< nodes?.length + 1; i++){
-      inc[i] = new Array(nodes?.length + 1);
-    }  
+      inc[i] = new Array(links?.length + 1);
+    }
+    //Adicionando o cabeçalho da matriz
     for(let i=0; i < nodes?.length; i++){
       inc[i+1][0] = nodes[i].id;
-      inc[0][i+1] = nodes[i].id;
     }
-    ///Logica para preencher as incidencias -> se o elemento inc[i][0] for um elemento do link[0][i] colocar 1, caso contrario 0;
-    let incLength = nodes?.length;
-    for (let i = 1; i < incLength+1; i++) {
-      for (let j = 1; j <incLength+1; j++) {            
-        links.forEach(item => {
-          if((item.source === inc[i][0] && item.target === inc[0][j]) || (item.target === inc[i][0] && item.source === inc[0][j])) return inc[i][j] = '1';              
-        })            
-      }
+    for(let i=0; i < links?.length; i++){
+      inc[0][i+1] = links[i].target + '-' +links[i].source;
     }
+    //Logica para preencher as incidencias -> se o elemento inc[i][0] for um elemento do link[0][i] colocar 1, caso contrario 0;
+    let nodesLength = nodes?.length;
+    let linksLength = links?.length;
+    // for (let i = 1; i < incLength+1; i++) {
+    //   for (let j = 1; j <incLength+1; j++) {            
+    //     links.forEach(item => {
+    //       if((item.source === inc[i][0] && item.target === inc[0][j]) || (item.target === inc[i][0] && item.source === inc[0][j])) return inc[i][j] = '1';              
+    //     })            
+    //   }
+    // }
     //Logica para preencher os elementos vazios ou que não tenha adjacencia
     inc[0][0] = ' ';
-    for (let i = 1; i < incLength+1; i++) {
-      for (let j = 1; j <incLength+1; j++) {
-        if(inc[i][j] != '1'){
-          inc[i][j] = '0'
-        }
-      }
-    }    
+    // for (let i = 1; i < linksLength+1; i++) {
+    //   for (let j = 1; j <nodesLength+1; j++) {
+    //     if(inc[i][j] != '1'){
+    //       inc[i][j] = '0'
+    //     }
+    //   }
+    // }    
     console.log('links', links);
     console.log('inc', inc);
+    setIncid(inc);
   }
 
   React.useEffect(() => {
    if(nodes?.length > 0){
     handleAdj();
+    handleInc();
    }
-  }, [links]);
+  }, [links, nodes]);
 
 
 
@@ -267,10 +273,22 @@ export default function ModalProduct() {
       <Grid container justify="center">
         <Grid
           container
-          justify="center"
-          alignItems="center"
+          justify="space-between"
           style={{ margin: 40 }}
         >
+          <Grid>
+            <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de adjacência</Typography>
+            <Grid>
+            {adj.map((item, i) => (
+              <Grid container>
+                {item.map((value, j )=> (
+                  <Typography align='center' style={{padding: 5, width: 50, fontWeight: (i === 0 || j === 0) && 'bold' }}>{value}</Typography>
+                ))}
+              </Grid>
+            ))}
+            </Grid>
+          </Grid>
+          <Grid>
           {nodeNames.map((item, index) => (
             <Grid container justify="center" alignItems="center">
               <Input
@@ -309,6 +327,19 @@ export default function ModalProduct() {
               <Grid container onClick={handleSave} alignItems="center">
                 <Typography>Salvar alterações</Typography> <MdSave />
               </Grid>
+            </Grid>
+          </Grid>
+          </Grid>
+          <Grid>
+            <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de incidência</Typography>
+            <Grid>
+            {incid.map((item, i) => (
+              <Grid container>
+                {item.map((value, j )=> (
+                  <Typography align='center' style={{padding: 5, width: 50, fontWeight: (i === 0 || j === 0) && 'bold' }}>{value}</Typography>
+                ))}
+              </Grid>
+            ))}
             </Grid>
           </Grid>
         </Grid>
