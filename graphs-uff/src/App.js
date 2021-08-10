@@ -19,6 +19,8 @@ export default function ModalProduct() {
   const [source, setSource] = useState(null);
   const [colorLink, setColorLink] = useState(null);
   const [linkLabel, setLinkLabel] = useState(null);
+  const [adj, setAdj] = useState([]);
+  const [inc, setInc] = useState([]);
 
   const data = {
     nodes,
@@ -57,7 +59,6 @@ export default function ModalProduct() {
       return i !== index ? arr.push(item) : arr.push(value)
     });
     setColors(arr);
-
   };
 
   const handleAddNodes = () => {
@@ -68,6 +69,61 @@ export default function ModalProduct() {
     setNodeNames(arr);
     setColors(arrC);
   };
+
+  const handleAdj = () => {
+    let adj = new Array(nodes?.length + 1);
+    for(let i=0; i< nodes?.length + 1; i++){
+      adj[i] = new Array(nodes?.length + 1);
+    }  
+    console.log('adj', adj);
+
+        for(let i=0; i < nodes?.length; i++){
+          adj[i+1][0] = nodes[i].id;
+          adj[0][i+1] = nodes[i].id;
+        }
+        ///Logica para preencher as adjacencias -> se o elemento adj[i][0] estiver linkado com adj[0][i] colocar 1, caso contrario 0
+        //if(((item.source === adj[i][0] && item.source === adj[0][j]) || (item.target === adj[i][0] && item.target === adj[0][j]) ? adj[i][j] === '1' : '0'))
+        let adjLength = nodes?.length;
+        for (let i = 1; i < adjLength+1; i++) {
+          for (let j = 1; j <adjLength+1; j++) {
+            console.log('adj[i][0]', adj[i][0], 'i', i);
+            console.log('adj[0][j]', adj[0][j], 'j', j);
+            links.forEach(item => {
+              if((item.source === adj[i][0] && item.target === adj[0][j]) || (item.target === adj[i][0] && item.source === adj[0][j])) return adj[i][j] = '1';
+              
+              
+            }
+              )
+            
+          }
+        }
+      for (let i = 1; i < adj.length +1; i++) {
+        for (let j = 1; j < adj.length + 1; j++) {
+         if(adj[i][j] !== '1') return adj[i][j] = '0';
+          
+        }
+        
+      }
+    console.log('links', links);
+    console.log('adj', adj);
+    // const arr = [];
+    // for (let i = 0; i < j; i++) {
+    //   console.log('cheguei no for')
+    //   let has = links[i].target === links[j -1].target || links[i].source === links[j -1 ].source ? arr.push('1') : arr.push('0');
+    //   nodes.forEach(item => console.log('id', item.id));
+    //   console.log('adj', arr)
+      
+    // }
+    
+  }
+
+  React.useEffect(() => {
+   if(nodes?.length > 0){
+    handleAdj();
+   }
+  }, [links]);
+
+
 
   const handleSave = () => {
     setNodes(
