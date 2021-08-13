@@ -7,11 +7,15 @@ import Input from './components/TextInput';
 import Dialog from './components/Dialog';
 
 
+const graphEX = [{id: 'NQ', color: "blue"}, {id: "MT", color: 'yellow'}, {id: "UN", color: 'green'}, {id: "PM", color: 'purple'}, {id: "UB", color: 'black'}, {id: "BH", color: 'grey'}, {id: "JF", color: 'pink'}]
+const linksEX = [{source: 'UB', target: 'PM', label: 280}, {source: 'PM', target: 'UN', label: 200}, {source: 'PM', target: 'BH', label: 400}, {source: 'UN', target: 'BH', label: 650}, {source: 'JF', target: 'BH', label: 300}, {source: 'BH', target: 'MT', label: 350}, {source: 'MT', target: 'NQ', label: 250}, {source: 'BH', target: 'NQ', label: 600},]
+
+
 export default function ModalProduct() {
-  const [nodes, setNodes] = useState([]);
+  const [nodes, setNodes] = useState(graphEX);
   const [nodeNames, setNodeNames] = useState(['']);
   const [colors, setColors] = useState(['']);
-  const [links, setLinks] = useState([]);
+  const [links, setLinks] = useState(linksEX);
   const [nodeSelected, setNodeSelected] = useState(null);
   const [originalColor, setOriginalColor] = useState(null);
   const [open, setOpen] = useState(false);
@@ -21,11 +25,19 @@ export default function ModalProduct() {
   const [linkLabel, setLinkLabel] = useState(null);
   const [adj, setAdj] = useState([]);
   const [incid, setIncid] = useState([]);
+  const [linksKruskal, setLinksKruskal] = useState([]);
+  const [init, setInit] = useState(false);
 
   const data = {
     nodes,
     links,
   };
+
+  const kruskal = {
+    nodes: graphEX,
+    links: linksKruskal,
+  }
+
 
   const myConfig = {
     nodeHighlightBehavior: true,
@@ -117,13 +129,18 @@ export default function ModalProduct() {
     //Logica para preencher as incidencias -> se o elemento inc[i][0] for um elemento do link[0][i] colocar 1, caso contrario 0;
     let nodesLength = nodes?.length;
     let linksLength = links?.length;
-    // for (let i = 1; i < incLength+1; i++) {
-    //   for (let j = 1; j <incLength+1; j++) {            
-    //     links.forEach(item => {
-    //       if((item.source === inc[i][0] && item.target === inc[0][j]) || (item.target === inc[i][0] && item.source === inc[0][j])) return inc[i][j] = '1';              
-    //     })            
-    //   }
-    // }
+    for (let i = 1; i < nodesLength+1; i++) {
+      let controlador = 1;
+      for (let j = 1; j <linksLength+1; j++) {       
+        
+        links.forEach(item => {
+          
+          if(item.source == inc[i][0] || item.target == inc[i][0]) return inc[i][controlador] = '1';      
+          controlador++;        
+        })            
+      }
+      
+    }
     //Logica para preencher os elementos vazios ou que não tenha adjacencia
     inc[0][0] = ' ';
     // for (let i = 1; i < linksLength+1; i++) {
@@ -144,6 +161,69 @@ export default function ModalProduct() {
     handleInc();
    }
   }, [links, nodes]);
+
+  
+
+  
+  const handleLinksKruskal = () => {
+    let arr = [];
+    links.forEach((item, i) => {
+        let soma = [];
+        let arrTarget = arr.forEach((filt, index) => {
+          if (index !== i && filt.target === item.target){
+             soma.push(filt.source)
+          } if(filt.source === item.target){
+             soma.push(filt.source);
+          } 
+        })
+      let arrSource = arr.forEach((filt, index) => {
+        if(index !== i && filt.source === item.source) soma.push(filt.target);
+        if(filt.target === item.source) soma.push(filt.target);
+      });
+      console.log('estou no passo', i);
+      console.log('item', item);
+      console.log('linksKruskal', arr);
+      console.log('arrTarget', arrTarget);
+      console.log('arrSource', arrSource);
+      console.log('soma', soma);
+      let validation = true;
+      for (let index = 0; index < soma.length - 1; index++) {
+        for (let j = 1; j < soma.length; index++) {
+          if(soma[index] === soma[j] || soma[index] === soma[j] || soma[index] === soma[j] || soma[index] === soma[j]){
+            return validation = false;
+          } 
+        }
+      }
+      console.log('validation', validation);
+      if(validation) { // condição para criar o link
+        arr.push({target: item.target, source: item.source, label: item.label})
+        setLinksKruskal(arr);
+      } 
+     
+    })
+  }
+
+  const handleSortLinks = () => {
+    const linkSorted = links.sort(function (a, b) {
+       if (a.label > b.label) {
+         return 1;
+       }
+       if (a.label < b.label) {
+         return -1;
+       }
+       // a must be equal to b
+       return 0;
+     });
+     handleLinksKruskal();
+   }
+
+  React.useEffect(() => {
+    if(links.length > 0 && init){
+     handleSortLinks();
+    }
+  }, [links, init])
+
+  
 
 
 
@@ -277,7 +357,7 @@ export default function ModalProduct() {
           style={{ margin: 40 }}
         >
           <Grid>
-            <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de adjacência</Typography>
+            {/* <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de adjacência</Typography>
             <Grid>
             {adj.map((item, i) => (
               <Grid container>
@@ -286,7 +366,7 @@ export default function ModalProduct() {
                 ))}
               </Grid>
             ))}
-            </Grid>
+            </Grid> */}
           </Grid>
           <Grid>
           {nodeNames.map((item, index) => (
@@ -331,7 +411,7 @@ export default function ModalProduct() {
           </Grid>
           </Grid>
           <Grid>
-            <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de incidência</Typography>
+            {/* <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de incidência</Typography>
             <Grid>
             {incid.map((item, i) => (
               <Grid container>
@@ -340,7 +420,7 @@ export default function ModalProduct() {
                 ))}
               </Grid>
             ))}
-            </Grid>
+            </Grid> */}
           </Grid>
         </Grid>
         {/* <Grid container justify='center'>
@@ -351,18 +431,29 @@ export default function ModalProduct() {
             <Typography>Matriz de incidência</Typography>
           </Grid>
         </Grid> */}
-        <Grid container justify="center" style={{border: '1px solid #000000', width: 800, marginBottom: 10}}>
-          <Graph
+        <Grid container spacing={1} justify="center" >
+         <Grid style={{border: '1px solid #000000', marginBottom: 10, marginRight: 100}}>
+         <Graph
             id="graph-id" // id is mandatory
             data={data}
             config={myConfig}
             onClickNode={onClickNode}
             onClickLink={onClickLink}
           />
+         </Grid>
+        <Grid style={{border: '1px solid #000000', marginBottom: 10}}>
+          <Graph
+            id="graph-id2" // id is mandatory
+            data={kruskal}
+            config={myConfig}
+            onClickNode={onClickNode}
+            onClickLink={onClickLink}
+          />
+          </Grid>
         </Grid>
       </Grid>
       <Grid container alignItems='flex-end' justify='center'>
-        <Typography>Trabalho realizado por Eriky Nunes e Gian Rocha</Typography>
+        <Typography onClick={() => setInit(true)}>Trabalho realizado por Eriky Nunes e Gian Rocha - Algoritmo de kruskal</Typography>
       </Grid>
     </Grid>    
   );
