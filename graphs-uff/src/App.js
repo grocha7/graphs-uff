@@ -27,6 +27,8 @@ export default function ModalProduct() {
   const [incid, setIncid] = useState([]);
   const [linksKruskal, setLinksKruskal] = useState([]);
   const [init, setInit] = useState(false);
+  const [kruskalAux, setKruskalAux] = useState([]);
+  const [popKruskal, setPopKruskal] = useState([]);
 
   const data = {
     nodes,
@@ -54,6 +56,25 @@ export default function ModalProduct() {
       labelProperty: 'label',
       label: '5',
       fontSize: 12,
+      fontWeight: 'bold'
+    },
+  };
+
+  const myConfig2 = {
+    nodeHighlightBehavior: true,
+    node: {
+      color: 'lightgreen',
+      size: 2000,
+      highlightStrokeColor: 'blue',
+      fontSize: 12,
+      fontWeight: 'bold'
+    },
+    link: {
+      highlightColor: 'lightblue',
+      renderLabel: true,
+      labelProperty: 'label',
+      label: '5',
+      fontSize: 14,
       fontWeight: 'bold'
     },
   };
@@ -169,35 +190,50 @@ export default function ModalProduct() {
     let arr = [];
     links.forEach((item, i) => {
         let soma = [];
+        console.log('-------------/----------');
         let arrTarget = arr.forEach((filt, index) => {
           if (index !== i && filt.target === item.target){
+            console.log('pushei 1', filt, item);
              soma.push(filt.source)
           } if(filt.source === item.target){
-             soma.push(filt.source);
+            console.log('pushei 2', filt, item)
+             soma.push(filt.target);
           } 
         })
       let arrSource = arr.forEach((filt, index) => {
-        if(index !== i && filt.source === item.source) soma.push(filt.target);
-        if(filt.target === item.source) soma.push(filt.target);
+        if(index !== i && filt.source === item.source) {            console.log('pushei 3', filt, item);
+         soma.push(filt.target)};
+        if(filt.target === item.source) { console.log('pushei 4', filt, item); soma.push(filt.source)};
       });
       console.log('estou no passo', i);
       console.log('item', item);
       console.log('linksKruskal', arr);
-      console.log('arrTarget', arrTarget);
-      console.log('arrSource', arrSource);
       console.log('soma', soma);
+      soma.sort();
+      console.log('somaSort', soma);
       let validation = true;
-      for (let index = 0; index < soma.length - 1; index++) {
-        for (let j = 1; j < soma.length; index++) {
-          if(soma[index] === soma[j] || soma[index] === soma[j] || soma[index] === soma[j] || soma[index] === soma[j]){
-            return validation = false;
-          } 
-        }
+      for (let index = 1; index < soma.length; index++) {
+        if(soma[index] === soma[index - 1]){
+          console.log('entrei aqui', soma[index]);
+          return validation = false; 
+          
+      } 
       }
+        // for (let index = 0; index < soma.length - 2; index++) {
+        //   for (let j = 1; j < soma.length && j !== index; index++) {
+        //      if(soma[index] === soma[j]){
+        //         console.log('entrei aqui', soma[index], soma[j]);
+        //         return validation = false; 
+               
+              
+        //     } 
+        //   }
+        // }
+
       console.log('validation', validation);
       if(validation) { // condição para criar o link
         arr.push({target: item.target, source: item.source, label: item.label})
-        setLinksKruskal(arr);
+        setKruskalAux(arr);
       } 
      
     })
@@ -218,10 +254,20 @@ export default function ModalProduct() {
    }
 
   React.useEffect(() => {
-    if(links.length > 0 && init){
+    if(links.length > 0){
      handleSortLinks();
     }
-  }, [links, init])
+  }, [links])
+
+  React.useEffect(() => {
+    if (init && kruskalAux.length > 0){
+      setLinksKruskal([...linksKruskal, kruskalAux[0]]);
+      const aux = kruskalAux.filter((item, index) => index !== 0)
+      setKruskalAux(aux);
+      setInit(false);
+    }
+    if(kruskalAux.length === 0 && linksKruskal.length > 0) return alert('todas as ligações ja foram feitas')
+  }, [init])
 
   
 
@@ -433,19 +479,19 @@ export default function ModalProduct() {
         </Grid> */}
         <Grid container spacing={1} justify="center" >
          <Grid style={{border: '1px solid #000000', marginBottom: 10, marginRight: 100}}>
-         <Graph
+         {/* <Graph
             id="graph-id" // id is mandatory
             data={data}
             config={myConfig}
             onClickNode={onClickNode}
             onClickLink={onClickLink}
-          />
+          /> */}
          </Grid>
         <Grid style={{border: '1px solid #000000', marginBottom: 10}}>
           <Graph
-            id="graph-id2" // id is mandatory
+            id="xdzao" // id is mandatory
             data={kruskal}
-            config={myConfig}
+            config={myConfig2}
             onClickNode={onClickNode}
             onClickLink={onClickLink}
           />
