@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Grid, IconButton, Typography } from '@material-ui/core';
+import { Grid, IconButton, Typography, Switch } from '@material-ui/core';
 import { Graph } from 'react-d3-graph';
 import { MdSave } from 'react-icons/md';
-import { AiFillDelete, AiOutlinePlus, AiFillFastBackward, AiFillFastForward } from 'react-icons/ai';
+import { AiFillDelete, AiOutlinePlus, AiFillFastBackward, AiFillFastForward, AiFillCaretRight, AiFillCaretLeft } from 'react-icons/ai';
 import Input from './components/TextInput';
 import Dialog from './components/Dialog';
 
@@ -29,6 +29,7 @@ export default function ModalProduct() {
   const [kruskalAux, setKruskalAux] = useState([]);
   const [popKruskal, setPopKruskal] = useState([]);
   const [minus, setMinus] = useState([]);
+  const [isKruskal, setIsKruskal] = useState(true);
 
   const data = {
     nodes,
@@ -62,10 +63,9 @@ export default function ModalProduct() {
 
   const myConfig2 = {
     automaticRearrangeAfterDropNode: false,
-    
     d3:{
       alphaTarget: 0.1,
-      // disableLinkForce: true,
+      disableLinkForce: true,
       gravity: -400,
       linkLength: 200,
     },
@@ -239,7 +239,7 @@ export default function ModalProduct() {
 
       console.log('validation', validation);
       if(validation) { // condição para criar o link
-        arr.push({target: item.target, source: item.source})
+        arr.push({target: item.target, source: item.source, label: item.label})
         setKruskalAux(arr);
       } 
      
@@ -266,6 +266,8 @@ export default function ModalProduct() {
     }
   }, [links])
 
+ 
+
   React.useEffect(() => {
     if (plus && kruskalAux.length > 0){
       setLinksKruskal([...linksKruskal, kruskalAux[0]]);
@@ -274,6 +276,11 @@ export default function ModalProduct() {
       setPlus(false);
     }
   }, [plus])
+
+  const handleFinishKruskal =  () => {
+    setLinksKruskal([...linksKruskal, ...kruskalAux]);
+    setKruskalAux([]);
+  }
 
   React.useEffect(() => {
     if (minus && linksKruskal.length > 0){
@@ -411,25 +418,25 @@ export default function ModalProduct() {
       }}/>
       Trabalho APA 2021.1
       <Grid container justify="center">
-        {/* <Grid
+        <Grid
           container
           justify="space-between"
           style={{ margin: 40 }}
         >
           <Grid>
-             <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de adjacência</Typography>
+             <Typography style={{fontWeight: 'bold', fontSize: 14, marginBottom: 10}} align='center'>Matriz de adjacência</Typography>
             <Grid>
             {adj.map((item, i) => (
               <Grid container>
                 {item.map((value, j )=> (
-                  <Typography align='center' style={{padding: 5, width: 50, fontWeight: (i === 0 || j === 0) && 'bold' }}>{value}</Typography>
+                  <Typography align='center' style={{padding: 3, width: 30, fontWeight: (i === 0 || j === 0) && 'bold', fontSize: 14 }}>{value}</Typography>
                 ))}
               </Grid>
             ))}
             </Grid> 
           </Grid>
           <Grid>
-          {nodeNames.map((item, index) => (
+          {/* {nodeNames.map((item, index) => (
             <Grid container justify="center" alignItems="center">
               <Input
                 field="Nó"
@@ -451,8 +458,8 @@ export default function ModalProduct() {
                 <AiFillDelete />
               </IconButton>
             </Grid>
-          ))}
-          <Grid container justify="center" style={{ marginTop: 40 }}>
+          ))} */}
+          {/* <Grid container justify="center" style={{ marginTop: 40 }}>
             <Grid>
               <Grid
                 container
@@ -468,9 +475,9 @@ export default function ModalProduct() {
                 <Typography>Salvar alterações</Typography> <MdSave />
               </Grid>
             </Grid>
+          </Grid> */}
           </Grid>
-          </Grid>
-          <Grid>
+          {/* <Grid>
             <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de incidência</Typography>
             <Grid>
             {incid.map((item, i) => (
@@ -481,15 +488,22 @@ export default function ModalProduct() {
               </Grid>
             ))}
             </Grid>
-          </Grid>
-        </Grid> */}
-        <Grid container justify='center' style={{margin: '100px 0px'}}>
+          </Grid> */}
+        </Grid>
+        {/* <Grid container justify='center' style={{margin: '100px 0px'}}> */}
           {/* <Grid>
 
           </Grid>
           <Grid>
             <Typography>Matriz de incidência</Typography>
           </Grid> */}
+        {/* </Grid> */}
+        <Grid component="label" container alignItems="center" justify='center' spacing={1}>
+          <Grid item>Trip</Grid>
+          <Grid item>
+            <Switch checked={isKruskal} onChange={() => setIsKruskal(!isKruskal)} name="checkedC" />
+          </Grid>
+          <Grid item>Kruskal</Grid>
         </Grid>
         <Grid container spacing={1} justify="center" >
          <Grid style={{border: '1px solid #000000', marginBottom: 10, marginRight: 100, padding: 1}}>
@@ -503,7 +517,9 @@ export default function ModalProduct() {
           />
          </Grid>
         <Grid style={{border: '1px solid #000000', marginBottom: 10, padding: 1}}>
-        <Typography align='center'>Grafo Kruskal</Typography>
+        {isKruskal ? (
+          <>
+            <Typography align='center'>Grafo Kruskal</Typography>
           <Graph
             id="xdzao" // id is mandatory
             data={kruskal}
@@ -511,6 +527,19 @@ export default function ModalProduct() {
             onClickNode={onClickNode}
             onClickLink={onClickLink}
           />
+          </>
+        ) : (
+          <>
+          <Typography align='center'>Grafo Trip</Typography>
+        <Graph
+          id="xdzada" // id is mandatory
+          data={data}
+          config={myConfig2}
+          onClickNode={onClickNode}
+          onClickLink={onClickLink}
+        />
+        </>
+        )}
           </Grid>
         </Grid>
       </Grid>
@@ -519,7 +548,7 @@ export default function ModalProduct() {
 
         
      {!(linksKruskal.length === 0 && kruskalAux.length > 0) && (
-             <IconButton onClick={() => setMinus(true)}><AiFillFastBackward/></IconButton>
+             <IconButton onClick={() => setMinus(true)}><AiFillCaretLeft/></IconButton>
 
      )}
      </Grid>
@@ -528,11 +557,16 @@ export default function ModalProduct() {
      <Typography align='center' style={{fontSize: 12}}>Desenvolvido por Eriky e Gian</Typography>
      </Grid>
         
-        <Grid style={{width: 50}}>
+        <Grid style={{width: 100}}>
+
         {!(kruskalAux.length === 0 && linksKruskal.length > 0)  && (
-             <IconButton onClick={() => setPlus(true)}><AiFillFastForward/></IconButton>
-             )
+          <Grid container>
+             <IconButton onClick={() => setPlus(true)}><AiFillCaretRight/></IconButton>
+             <IconButton onClick={() => handleFinishKruskal()}><AiFillFastForward/></IconButton>
+          </Grid>
+        )
         }
+
         </Grid>
       </Grid>
     </Grid>    
