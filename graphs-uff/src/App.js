@@ -621,12 +621,12 @@ export default function ModalProduct() {
       </Grid>
       {!isKruskal && nodePrim && (
         <Grid style={{marginTop: 30}}>
-          <Typography>Possiveis caminhos</Typography>
+          <Typography align='center' style={{fontSize: 20}}>Possiveis caminhos</Typography>
           <Grid container>
-            Target | Source | Label
+           
           </Grid>
-          {routesPrim.map(item => (
-            <Typography>{item.target} | {item.source} | {item.label}</Typography>
+          {routesPrim.map((item, index) => (
+            <Typography align='center' style={{fontWeight: index === 0 && 'bold', margin: 8}}>{item.target} ->  {item.source} | {item.label}</Typography>
           ))}
 
         </Grid>
