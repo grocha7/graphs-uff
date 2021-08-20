@@ -7,7 +7,7 @@ import Input from './components/TextInput';
 import Dialog from './components/Dialog';
 
 const graphEX = [{id: 'NQ', color: "blue"}, {id: "MT", color: 'yellow'}, {id: "UN", color: 'green'}, {id: "PM", color: 'purple'}, {id: "UB", color: 'black'}, {id: "BH", color: 'grey'}, {id: "JF", color: 'pink'}]
-const linksEX = [{source: 'UB', target: 'PM', label: 280}, {source: 'PM', target: 'UN', label: 200}, {source: 'PM', target: 'BH', label: 400}, {source: 'UN', target: 'BH', label: 650}, {source: 'JF', target: 'BH', label: 300}, {source: 'BH', target: 'MT', label: 350}, {source: 'MT', target: 'NQ', label: 250}, {source: 'BH', target: 'NQ', label: 600},]
+const linksEX = [{source: 'UB', target: 'PM', label: 280}, {source: 'PM', target: 'UN', label: 200}, {source: 'PM', target: 'BH', label: 400}, {source: 'UN', target: 'BH', label: 650}, {source: 'JF', target: 'BH', label: 300}, {source: 'BH', target: 'MT', label: 350}, {source: 'MT', target: 'NQ', label: 250}, {source: 'BH', target: 'NQ', label: 380},]
 
 
 export default function ModalProduct() {
@@ -161,15 +161,7 @@ export default function ModalProduct() {
       }
       
     }
-    //Logica para preencher os elementos vazios ou que não tenha adjacencia
     inc[0][0] = ' ';
-    // for (let i = 1; i < linksLength+1; i++) {
-    //   for (let j = 1; j <nodesLength+1; j++) {
-    //     if(inc[i][j] != '1'){
-    //       inc[i][j] = '0'
-    //     }
-    //   }
-    // }    
     console.log('links', links);
     console.log('inc', inc);
     setIncid(inc);
@@ -182,9 +174,6 @@ export default function ModalProduct() {
    }
   }, [links, nodes]);
 
-  
-
-  
   const handleLinksKruskal = () => {
     let arr = [];
     links.forEach((item, i) => {
@@ -218,16 +207,6 @@ export default function ModalProduct() {
           
       } 
       }
-        // for (let index = 0; index < soma.length - 2; index++) {
-        //   for (let j = 1; j < soma.length && j !== index; index++) {
-        //      if(soma[index] === soma[j]){
-        //         console.log('entrei aqui', soma[index], soma[j]);
-        //         return validation = false; 
-               
-              
-        //     } 
-        //   }
-        // }
 
       console.log('validation', validation);
       if(validation) { // condição para criar o link
@@ -239,22 +218,47 @@ export default function ModalProduct() {
   }
 
   const handleLinksPrim = () => {
+    
     let arr = nodePrim.map(item => item);
     console.log('arr', arr);
     console.log('primAux', primAux);
     const filter = primAux.filter(item => arr.includes(item.target) || arr.includes(item.source));
+    
     setPrimAux(primAux.filter((item) => item !== filter[0]));
     setRoutesPrim(filter);
-    setLinksPrim([...linksPrim, filter[0]]);
     const newNode = arr.includes(filter[0].target) ? filter[0].source : filter[0].target
-    setCountPrim(countPrim + 1);
+    const nodeVaiLigar = !arr.includes(filter[0].target) ? filter[0].source : filter[0].target
+    const lig_newNode = [];
+    const lig_nodeVaiLigar = [];
+
+    linksPrim.forEach(item => item.target === newNode ? lig_newNode.push(item.source) : item.source === newNode && lig_newNode.push(item.target));
+    linksPrim.forEach(item => item.target === nodeVaiLigar ? lig_nodeVaiLigar.push(item.source) : item.source === nodeVaiLigar && lig_nodeVaiLigar.push(item.target));
+    const soma = [...lig_newNode, ...lig_nodeVaiLigar];
+    soma.sort();
+    console.log('-----------/-----------');
+    console.log('soma', soma);
     console.log('newNode', newNode);
-    console.log('filter', filter);
+    console.log('lig_newNode', lig_newNode);
+    console.log('nodeVaiLigar', nodeVaiLigar);
+    console.log('lig_nodeVaiLigar', lig_nodeVaiLigar);
+    console.log('arr', arr);
+    console.log('linksPrim', linksPrim);
+    console.log('-----------/-----------');
+
+    let validation = true;
+    for (let index = 1; index < soma.length; index++) {
+      if(soma[index] === soma[index - 1]){
+        console.log('entrei aqui', soma[index]);
+        return validation = false; 
+        
+    } 
+    }
     arr.push(newNode);
     setNodePrim(arr);
-  }
+    if(!validation) return alert('não vai ligar nada!');
+    setLinksPrim([...linksPrim, filter[0]]);
 
-  
+  }
 
   const handleSortLinks = () => {
     const linkSorted = links.sort(function (a, b) {
@@ -276,8 +280,6 @@ export default function ModalProduct() {
      setPrimAux(links)
     }
   }, [links])
-
- 
 
   React.useEffect(() => {
     if (plus && kruskalAux.length > 0){
@@ -307,35 +309,34 @@ export default function ModalProduct() {
   }, [minus])
 
   React.useEffect(() => {
-    if (plusPrim && kruskalAux.length > 0){
-      setLinksKruskal([...linksKruskal, kruskalAux[0]]);
-      const aux = kruskalAux.filter((item, index) => index !== 0)
-      setKruskalAux(aux);
+    if (plusPrim && primAux.length > 0){
+      handleLinksPrim();
       setPlusPrim(false);
     }
   }, [plusPrim])
 
   const handleFinishPrim =  () => {
-    setLinksKruskal([...linksKruskal, ...kruskalAux]);
-    setKruskalAux([]);
+    for (let index = 0; index < primAux.length; index++) {
+      setTimeout(() => setPlusPrim(true), 1000);
+      
+    };
   }
 
   const handleInitPrim = () => {
-    setLinksKruskal([]);
-    setKruskalAux([...linksKruskal, ...kruskalAux]);
+    console.log('cheguei aqui');
+    setPrimAux(links)
+    setLinksPrim([]);
+    setRoutesPrim([]);
   }
 
   React.useEffect(() => {
-    if (minusPrim && linksKruskal.length > 0){
-      setKruskalAux([ linksKruskal[linksKruskal.length - 1], ...kruskalAux]);
-      setLinksKruskal(linksKruskal.filter((item, index) => index !== linksKruskal.length - 1));
+    if (minusPrim && linksPrim.length > 0){
+      setPrimAux([ linksPrim[linksPrim.length - 1], ...primAux]);
+      setLinksPrim(linksPrim.filter((item, index) => index !== linksPrim.length - 1));
+      setRoutesPrim([routesPrim[0]]);
       setMinusPrim(false);
     }
   }, [minusPrim])
-
-  
-
-
 
   const handleSave = () => {
     setNodes(
@@ -472,70 +473,9 @@ export default function ModalProduct() {
           justify="space-between"
           style={{ margin: 40 }}
         >
-          
           <Grid>
-          {/* {nodeNames.map((item, index) => (
-            <Grid container justify="center" alignItems="center">
-              <Input
-                field="Nó"
-                onChange={event => handleChangeNodes(event.target.value, index)}
-                width={100}
-                marginRight={20}
-              />{' '}
-              <Input
-                field="Cor"
-                select
-                options={['blue', 'yellow', 'green', 'purple', 'black', 'grey', 'pink']}
-                onChange={event =>
-                  handleChangeColors(event.target.value, index)
-                }
-                width={100}
-                marginRight={20}
-              />
-              <IconButton onClick={() => handleDelete(index)}>
-                <AiFillDelete />
-              </IconButton>
-            </Grid>
-          ))} */}
-          {/* <Grid container justify="center" style={{ marginTop: 40 }}>
-            <Grid>
-              <Grid
-                container
-                onClick={handleAddNodes}
-                alignItems="center"
-                style={{ marginRight: 20 }}
-              >
-                <Typography>Adicionar novo nó</Typography> <AiOutlinePlus />
-              </Grid>
-            </Grid>
-            <Grid>
-              <Grid container onClick={handleSave} alignItems="center">
-                <Typography>Salvar alterações</Typography> <MdSave />
-              </Grid>
-            </Grid>
-          </Grid> */}
           </Grid>
-          {/* <Grid>
-            <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de incidência</Typography>
-            <Grid>
-            {incid.map((item, i) => (
-              <Grid container>
-                {item.map((value, j )=> (
-                  <Typography align='center' style={{padding: 5, width: 50, fontWeight: (i === 0 || j === 0) && 'bold' }}>{value}</Typography>
-                ))}
-              </Grid>
-            ))}
-            </Grid>
-          </Grid> */}
         </Grid>
-        {/* <Grid container justify='center' style={{margin: '100px 0px'}}> */}
-          {/* <Grid>
-
-          </Grid>
-          <Grid>
-            <Typography>Matriz de incidência</Typography>
-          </Grid> */}
-        {/* </Grid> */}
         <Grid component="label" container alignItems="center" justify='center' spacing={1}>
           <Grid item>Prim</Grid>
           <Grid item>
@@ -562,8 +502,6 @@ export default function ModalProduct() {
             id="xdzao" // id is mandatory
             data={kruskal}
             config={myConfig2}
-            // onClickNode={onClickNode}
-            // onClickLink={onClickLink}
           />
           </>
         ) : (
@@ -574,7 +512,6 @@ export default function ModalProduct() {
           data={prim}
           config={myConfig2}
           onClickNode={handleSelectNodePrim}
-          // onClickLink={onClickLink}
         />
         </>
         )}
@@ -590,9 +527,9 @@ export default function ModalProduct() {
           <IconButton onClick={() => handleInitKruskal()}><AiFillFastBackward/></IconButton>
           <IconButton onClick={() => setMinus(true)}><AiFillCaretLeft/></IconButton>
         </Grid>
-     ) : (
+     ) : !(linksPrim.length === 0 && primAux.length > 0) && (
       <Grid container>
-      <IconButton ><AiFillFastBackward/></IconButton>
+      <IconButton onClick={() => handleInitPrim()}><AiFillFastBackward/></IconButton>
       <IconButton onClick={() => setMinusPrim(true)}><AiFillCaretLeft/></IconButton>
     </Grid>
      )}
@@ -609,10 +546,10 @@ export default function ModalProduct() {
              <IconButton onClick={() => setPlus(true)}><AiFillCaretRight/></IconButton>
              <IconButton onClick={() => handleFinishKruskal()}><AiFillFastForward/></IconButton>
           </Grid>
-        ) : (
+        ) :  !(primAux.length === 0 && linksPrim.length > 0)  && (
           <Grid container>
-             <IconButton onClick={() => handleLinksPrim(true)}><AiFillCaretRight/></IconButton>
-             <IconButton onClick={() => handleFinishKruskal()}><AiFillFastForward/></IconButton>
+             <IconButton onClick={() => setPlusPrim(true)}><AiFillCaretRight/></IconButton>
+             <IconButton onClick={() => handleFinishPrim()}><AiFillFastForward/></IconButton>
           </Grid>
         )
         }
@@ -631,30 +568,6 @@ export default function ModalProduct() {
 
         </Grid>
       )}
-      {/* <Grid>
-             <Typography style={{fontWeight: 'bold', fontSize: 14, marginTop: 30}} align='center'>Matriz de adjacência</Typography>
-            <Grid>
-            {adj.map((item, i) => (
-              <Grid container>
-                {item.map((value, j )=> (
-                  <Typography align='center' style={{padding: 3, width: 30, fontWeight: (i === 0 || j === 0) && 'bold', fontSize: 14 }}>{value}</Typography>
-                ))}
-              </Grid>
-            ))}
-            </Grid> 
-          </Grid> */}
-          {/* <Grid>
-            <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de incidência</Typography>
-            <Grid>
-            {incid.map((item, i) => (
-              <Grid container>
-                {item.map((value, j )=> (
-                  <Typography align='center' style={{padding: 5, width: 50, fontWeight: (i === 0 || j === 0) && 'bold' }}>{value}</Typography>
-                ))}
-              </Grid>
-            ))}
-            </Grid>
-          </Grid> */}
     </Grid>    
   );
 }
