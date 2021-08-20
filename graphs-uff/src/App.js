@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { Grid, IconButton, Typography } from '@material-ui/core';
+import { Grid, IconButton, Typography, Switch } from '@material-ui/core';
 import { Graph } from 'react-d3-graph';
 import { MdSave } from 'react-icons/md';
-import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai';
+import { AiFillDelete, AiOutlinePlus, AiFillFastBackward, AiFillFastForward, AiFillCaretRight, AiFillCaretLeft } from 'react-icons/ai';
 import Input from './components/TextInput';
 import Dialog from './components/Dialog';
 
+const graphEX = [{id: 'NQ', color: "blue"}, {id: "MT", color: 'yellow'}, {id: "UN", color: 'green'}, {id: "PM", color: 'purple'}, {id: "UB", color: 'black'}, {id: "BH", color: 'grey'}, {id: "JF", color: 'pink'}]
+const linksEX = [{source: 'UB', target: 'PM', label: 280}, {source: 'PM', target: 'UN', label: 200}, {source: 'PM', target: 'BH', label: 400}, {source: 'UN', target: 'BH', label: 650}, {source: 'JF', target: 'BH', label: 300}, {source: 'BH', target: 'MT', label: 350}, {source: 'MT', target: 'NQ', label: 250}, {source: 'BH', target: 'NQ', label: 600},]
+
 
 export default function ModalProduct() {
-  const [nodes, setNodes] = useState([]);
+  const [nodes, setNodes] = useState(graphEX);
   const [nodeNames, setNodeNames] = useState(['']);
   const [colors, setColors] = useState(['']);
-  const [links, setLinks] = useState([]);
+  const [links, setLinks] = useState(linksEX);
   const [nodeSelected, setNodeSelected] = useState(null);
   const [originalColor, setOriginalColor] = useState(null);
   const [open, setOpen] = useState(false);
@@ -21,14 +24,43 @@ export default function ModalProduct() {
   const [linkLabel, setLinkLabel] = useState(null);
   const [adj, setAdj] = useState([]);
   const [incid, setIncid] = useState([]);
+  const [linksKruskal, setLinksKruskal] = useState([]);
+  const [plus, setPlus] = useState(false);
+  const [kruskalAux, setKruskalAux] = useState([]);
+  const [popKruskal, setPopKruskal] = useState([]);
+  const [minus, setMinus] = useState([]);
+  const [isKruskal, setIsKruskal] = useState(false);
+  const [linksPrim, setLinksPrim] = useState([]);
+  const [nodePrim, setNodePrim] = useState(null);
+  const [plusPrim, setPlusPrim] = useState(false);
+  const [minusPrim, setMinusPrim] = useState(false);
+  const [primAux, setPrimAux] = useState([]);
+  const [routesPrim, setRoutesPrim] = useState([]);
+  const [countPrim, setCountPrim] = useState(0);
 
   const data = {
     nodes,
     links,
   };
 
-  const myConfig = {
-    nodeHighlightBehavior: true,
+  const kruskal = {
+    nodes: graphEX,
+    links: linksKruskal,
+  }
+
+  const prim = {
+    nodes: graphEX,
+    links: linksPrim,
+  }
+
+  const myConfig2 = {
+    automaticRearrangeAfterDropNode: false,
+    d3:{
+      alphaTarget: 0.1,
+      disableLinkForce: true,
+      gravity: -400,
+      linkLength: 200,
+    },
     node: {
       color: 'lightgreen',
       size: 2000,
@@ -41,7 +73,7 @@ export default function ModalProduct() {
       renderLabel: true,
       labelProperty: 'label',
       label: '5',
-      fontSize: 12,
+      fontSize: 14,
       fontWeight: 'bold'
     },
   };
@@ -118,11 +150,24 @@ export default function ModalProduct() {
     let nodesLength = nodes?.length;
     let linksLength = links?.length;
     for (let i = 1; i < nodesLength+1; i++) {
+<<<<<<< HEAD
       for (let j = 1; j <linksLength+1; j++) {            
         links.forEach(item => {
           if(item.source == inc[i][0] || item.target == inc[i][0]) return inc[i][j] = '1';              
         })            
       }
+=======
+      let controlador = 1;
+      for (let j = 1; j <linksLength+1; j++) {       
+        
+        links.forEach(item => {
+          
+          if(item.source == inc[i][0] || item.target == inc[i][0]) return inc[i][controlador] = '1';      
+          controlador++;        
+        })            
+      }
+      
+>>>>>>> 09da66b0edf9ceaa6c368d8769f48f49ee923413
     }
     //Logica para preencher os elementos vazios ou que não tenha adjacencia
     inc[0][0] = ' ';
@@ -144,6 +189,159 @@ export default function ModalProduct() {
     handleInc();
    }
   }, [links, nodes]);
+
+  
+
+  
+  const handleLinksKruskal = () => {
+    let arr = [];
+    links.forEach((item, i) => {
+        let soma = [];
+        console.log('-------------/----------');
+        let arrTarget = arr.forEach((filt, index) => {
+          if (index !== i && filt.target === item.target){
+            console.log('pushei 1', filt, item);
+             soma.push(filt.source)
+          } if(filt.source === item.target){
+            console.log('pushei 2', filt, item)
+             soma.push(filt.target);
+          } 
+        })
+      let arrSource = arr.forEach((filt, index) => {
+        if(index !== i && filt.source === item.source) {            console.log('pushei 3', filt, item);
+         soma.push(filt.target)};
+        if(filt.target === item.source) { console.log('pushei 4', filt, item); soma.push(filt.source)};
+      });
+      console.log('estou no passo', i);
+      console.log('item', item);
+      console.log('linksKruskal', arr);
+      console.log('soma', soma);
+      soma.sort();
+      console.log('somaSort', soma);
+      let validation = true;
+      for (let index = 1; index < soma.length; index++) {
+        if(soma[index] === soma[index - 1]){
+          console.log('entrei aqui', soma[index]);
+          return validation = false; 
+          
+      } 
+      }
+        // for (let index = 0; index < soma.length - 2; index++) {
+        //   for (let j = 1; j < soma.length && j !== index; index++) {
+        //      if(soma[index] === soma[j]){
+        //         console.log('entrei aqui', soma[index], soma[j]);
+        //         return validation = false; 
+               
+              
+        //     } 
+        //   }
+        // }
+
+      console.log('validation', validation);
+      if(validation) { // condição para criar o link
+        arr.push({target: item.target, source: item.source, label: item.label})
+        setKruskalAux(arr);
+      } 
+     
+    })
+  }
+
+  const handleLinksPrim = () => {
+    let arr = nodePrim.map(item => item);
+    console.log('arr', arr);
+    console.log('primAux', primAux);
+    const filter = primAux.filter(item => arr.includes(item.target) || arr.includes(item.source));
+    setPrimAux(primAux.filter((item) => item !== filter[0]));
+    setRoutesPrim(filter);
+    setLinksPrim([...linksPrim, filter[0]]);
+    const newNode = arr.includes(filter[0].target) ? filter[0].source : filter[0].target
+    setCountPrim(countPrim + 1);
+    console.log('newNode', newNode);
+    console.log('filter', filter);
+    arr.push(newNode);
+    setNodePrim(arr);
+  }
+
+  
+
+  const handleSortLinks = () => {
+    const linkSorted = links.sort(function (a, b) {
+       if (a.label > b.label) {
+         return 1;
+       }
+       if (a.label < b.label) {
+         return -1;
+       }
+       // a must be equal to b
+       return 0;
+     });
+     handleLinksKruskal();
+   }
+
+  React.useEffect(() => {
+    if(links.length > 0){
+     handleSortLinks();
+     setPrimAux(links)
+    }
+  }, [links])
+
+ 
+
+  React.useEffect(() => {
+    if (plus && kruskalAux.length > 0){
+      setLinksKruskal([...linksKruskal, kruskalAux[0]]);
+      const aux = kruskalAux.filter((item, index) => index !== 0)
+      setKruskalAux(aux);
+      setPlus(false);
+    }
+  }, [plus])
+
+  const handleFinishKruskal =  () => {
+    setLinksKruskal([...linksKruskal, ...kruskalAux]);
+    setKruskalAux([]);
+  }
+
+  const handleInitKruskal = () => {
+    setLinksKruskal([]);
+    setKruskalAux([...linksKruskal, ...kruskalAux]);
+  }
+
+  React.useEffect(() => {
+    if (minus && linksKruskal.length > 0){
+      setKruskalAux([ linksKruskal[linksKruskal.length - 1], ...kruskalAux]);
+      setLinksKruskal(linksKruskal.filter((item, index) => index !== linksKruskal.length - 1));
+      setMinus(false);
+    }
+  }, [minus])
+
+  React.useEffect(() => {
+    if (plusPrim && kruskalAux.length > 0){
+      setLinksKruskal([...linksKruskal, kruskalAux[0]]);
+      const aux = kruskalAux.filter((item, index) => index !== 0)
+      setKruskalAux(aux);
+      setPlusPrim(false);
+    }
+  }, [plusPrim])
+
+  const handleFinishPrim =  () => {
+    setLinksKruskal([...linksKruskal, ...kruskalAux]);
+    setKruskalAux([]);
+  }
+
+  const handleInitPrim = () => {
+    setLinksKruskal([]);
+    setKruskalAux([...linksKruskal, ...kruskalAux]);
+  }
+
+  React.useEffect(() => {
+    if (minusPrim && linksKruskal.length > 0){
+      setKruskalAux([ linksKruskal[linksKruskal.length - 1], ...kruskalAux]);
+      setLinksKruskal(linksKruskal.filter((item, index) => index !== linksKruskal.length - 1));
+      setMinusPrim(false);
+    }
+  }, [minusPrim])
+
+  
 
 
 
@@ -172,6 +370,12 @@ export default function ModalProduct() {
       }))
     );
   };
+
+  const handleSelectNodePrim = (nodeId) => {
+    if(linksPrim.length > 0) return;
+    const nodeX = nodes.filter(item => item.id === nodeId);
+    setNodePrim([nodeX[0].id])
+  }
 
   const onClickNode = function(nodeId) {
     const nodeX = nodes.filter(item => item.id === nodeId);
@@ -276,20 +480,9 @@ export default function ModalProduct() {
           justify="space-between"
           style={{ margin: 40 }}
         >
+          
           <Grid>
-            <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de adjacência</Typography>
-            <Grid>
-            {adj.map((item, i) => (
-              <Grid container>
-                {item.map((value, j )=> (
-                  <Typography align='center' style={{padding: 5, width: 50, fontWeight: (i === 0 || j === 0) && 'bold' }}>{value}</Typography>
-                ))}
-              </Grid>
-            ))}
-            </Grid>
-          </Grid>
-          <Grid>
-          {nodeNames.map((item, index) => (
+          {/* {nodeNames.map((item, index) => (
             <Grid container justify="center" alignItems="center">
               <Input
                 field="Nó"
@@ -311,8 +504,8 @@ export default function ModalProduct() {
                 <AiFillDelete />
               </IconButton>
             </Grid>
-          ))}
-          <Grid container justify="center" style={{ marginTop: 40 }}>
+          ))} */}
+          {/* <Grid container justify="center" style={{ marginTop: 40 }}>
             <Grid>
               <Grid
                 container
@@ -328,9 +521,9 @@ export default function ModalProduct() {
                 <Typography>Salvar alterações</Typography> <MdSave />
               </Grid>
             </Grid>
+          </Grid> */}
           </Grid>
-          </Grid>
-          <Grid>
+          {/* <Grid>
             <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de incidência</Typography>
             <Grid>
             {incid.map((item, i) => (
@@ -341,29 +534,135 @@ export default function ModalProduct() {
               </Grid>
             ))}
             </Grid>
-          </Grid>
+          </Grid> */}
         </Grid>
-        {/* <Grid container justify='center'>
-          <Grid>
+        {/* <Grid container justify='center' style={{margin: '100px 0px'}}> */}
+          {/* <Grid>
 
           </Grid>
           <Grid>
             <Typography>Matriz de incidência</Typography>
+          </Grid> */}
+        {/* </Grid> */}
+        <Grid component="label" container alignItems="center" justify='center' spacing={1}>
+          <Grid item>Prim</Grid>
+          <Grid item>
+            <Switch checked={isKruskal} onChange={() => setIsKruskal(!isKruskal)} name="checkedC" />
           </Grid>
-        </Grid> */}
-        <Grid container justify="center" style={{border: '1px solid #000000', width: 800, marginBottom: 10}}>
-          <Graph
+          <Grid item>Kruskal</Grid>
+        </Grid>
+        <Grid container spacing={1} justify="center" >
+         <Grid style={{border: '1px solid #000000', marginBottom: 10, marginRight: 100, padding: 1}}>
+           <Typography align='center'>Grafo original</Typography>
+         <Graph
             id="graph-id" // id is mandatory
             data={data}
-            config={myConfig}
-            onClickNode={onClickNode}
-            onClickLink={onClickLink}
+            config={myConfig2}
+            // onClickNode={onClickNode}
+            // onClickLink={onClickLink}
           />
+         </Grid>
+        <Grid style={{border: '1px solid #000000', marginBottom: 10, padding: 1}}>
+        {isKruskal ? (
+          <>
+            <Typography align='center'>Grafo Kruskal</Typography>
+          <Graph
+            id="xdzao" // id is mandatory
+            data={kruskal}
+            config={myConfig2}
+            // onClickNode={onClickNode}
+            // onClickLink={onClickLink}
+          />
+          </>
+        ) : (
+          <>
+          <Typography align='center'>Grafo Prim | {nodePrim && `Nó inicial - ${nodePrim[0]}`}</Typography>
+        <Graph
+          id="xdzada" // id is mandatory
+          data={prim}
+          config={myConfig2}
+          onClickNode={handleSelectNodePrim}
+          // onClickLink={onClickLink}
+        />
+        </>
+        )}
+          </Grid>
         </Grid>
       </Grid>
-      <Grid container alignItems='flex-end' justify='center'>
-        <Typography>Trabalho realizado por Eriky Nunes e Gian Rocha</Typography>
+      <Grid container alignItems='center' justify='center'>
+        <Grid style={{width: 100}}>
+
+        
+     {isKruskal ? !(linksKruskal.length === 0 && kruskalAux.length > 0) && (
+        <Grid container>
+          <IconButton onClick={() => handleInitKruskal()}><AiFillFastBackward/></IconButton>
+          <IconButton onClick={() => setMinus(true)}><AiFillCaretLeft/></IconButton>
+        </Grid>
+     ) : (
+      <Grid container>
+      <IconButton ><AiFillFastBackward/></IconButton>
+      <IconButton onClick={() => setMinusPrim(true)}><AiFillCaretLeft/></IconButton>
+    </Grid>
+     )}
+     </Grid>
+     <Grid style={{margin: '0px 20px'}}>
+     <Typography style={{fontWeight: 'bold', fontSize: 20}} align='center' >Algoritmo de {isKruskal ? 'Kruskal' : 'Prim'} </Typography>
+     <Typography align='center' style={{fontSize: 12}}>Desenvolvido por Eriky e Gian</Typography>
+     </Grid>
+        
+        <Grid style={{width: 100}}>
+
+        {isKruskal ? !(kruskalAux.length === 0 && linksKruskal.length > 0)  && (
+          <Grid container>
+             <IconButton onClick={() => setPlus(true)}><AiFillCaretRight/></IconButton>
+             <IconButton onClick={() => handleFinishKruskal()}><AiFillFastForward/></IconButton>
+          </Grid>
+        ) : (
+          <Grid container>
+             <IconButton onClick={() => handleLinksPrim(true)}><AiFillCaretRight/></IconButton>
+             <IconButton onClick={() => handleFinishKruskal()}><AiFillFastForward/></IconButton>
+          </Grid>
+        )
+        }
+
+        </Grid>
       </Grid>
+      {!isKruskal && nodePrim && (
+        <Grid style={{marginTop: 30}}>
+          <Typography align='center' style={{fontSize: 20}}>Possiveis caminhos</Typography>
+          <Grid container>
+           
+          </Grid>
+          {routesPrim.map((item, index) => (
+            <Typography align='center' style={{fontWeight: index === 0 && 'bold', margin: 8}}>{item.target} ->  {item.source} | {item.label}</Typography>
+          ))}
+
+        </Grid>
+      )}
+      {/* <Grid>
+             <Typography style={{fontWeight: 'bold', fontSize: 14, marginTop: 30}} align='center'>Matriz de adjacência</Typography>
+            <Grid>
+            {adj.map((item, i) => (
+              <Grid container>
+                {item.map((value, j )=> (
+                  <Typography align='center' style={{padding: 3, width: 30, fontWeight: (i === 0 || j === 0) && 'bold', fontSize: 14 }}>{value}</Typography>
+                ))}
+              </Grid>
+            ))}
+            </Grid> 
+          </Grid> */}
+          {/* <Grid>
+            <Typography style={{fontWeight: 'bold', fontSize: 16, marginBottom: 10}} align='center'>Matriz de incidência</Typography>
+            <Grid>
+            {incid.map((item, i) => (
+              <Grid container>
+                {item.map((value, j )=> (
+                  <Typography align='center' style={{padding: 5, width: 50, fontWeight: (i === 0 || j === 0) && 'bold' }}>{value}</Typography>
+                ))}
+              </Grid>
+            ))}
+            </Grid>
+          </Grid> */}
     </Grid>    
   );
 }
